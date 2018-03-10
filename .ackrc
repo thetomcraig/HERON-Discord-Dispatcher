@@ -1,0 +1,16 @@
+--sort-files
+--color
+
+--ignore-file=is:tags
+--ignore-file=is:.coverage
+--ignore-file=is:package.json
+--ignore-file=is:package-lock.json
+
+--ignore-file=match:.*\.pyc
+--ignore-file=match:.*\.sw.*
+--ignore-file=match:.*\.rst
+
+--ignore-dir=htmlcov
+--ignore-dir=build
+--ignore-dir=env
+--ignore-dir=.idea
