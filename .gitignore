@@ -28,3 +28,4 @@ htmlcov/
 .idea/
 
 package-lock.json
+.DS-Store
