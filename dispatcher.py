@@ -3,12 +3,12 @@ import random
 
 import discord
 
-from local_settings import discord_key
+from local_settings import discord_key, discord_key_2
 
 
 class Bot():
 
-    def __init__(self, name):
+    def __init__(self, name, key):
         self.name = name
         self.client = discord.Client()
 
@@ -28,6 +28,8 @@ class Bot():
             This function will loop, it sends a message,
             then gets called again when that message gets sent
             """
+            print(self.name)
+            print('on message')
             tmp = await self.client.send_message(message.channel, 'Calculating messages...')
 
             response = self.get_response(message)
@@ -37,9 +39,8 @@ class Bot():
             # Sleep for a random amount of time, then send the message
             timeout = random.randrange(1, 10)
             await asyncio.sleep(timeout)
-            print('here')
             await self.client.send_message(message.channel, response)
-        self.client.run(discord_key)
+        self.client.run(key)
 
         self.client.send_message(self.client.channel, 'test')
 
@@ -60,4 +61,5 @@ class Bot():
         return 'test hi'
 
 
-anger_bot = Bot('angry_bot')
+angry_bot = Bot('angry_bot', discord_key_2)
+trump_bot = Bot('trump_bot', discord_key)
