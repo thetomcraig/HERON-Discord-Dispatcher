@@ -4,6 +4,8 @@ import sys
 
 import discord
 
+from api_helpers import send_heard_message
+
 timeout = 5
 all_messages = []
 
@@ -19,22 +21,6 @@ def run_bot(discord_key):
         print(client.user.id)
         print('------')
 
-    def get_response(message):
-        """
-        Send the message to the backend
-        The backend will generate a response and save it to the database, then return it
-        """
-        # r = requests.get('API_ENDPOINT')
-        # Do some corner case checking.. is this the first message?
-        #  counter = 0
-        #  tmp = await client.send_message(message.channel, 'Calculating messages...')
-        #  async for log in client.logs_from(message.channel, limit=100):
-        #  if log.author == message.author:
-        #  counter += 1
-        # Maybe look at all the previous messsages?
-        all_messages.extend(message.content)
-        return 'test hi'
-
     @client.event
     async def on_message(message):
         """
@@ -43,14 +29,17 @@ def run_bot(discord_key):
         """
         tmp = await client.send_message(message.channel, 'Calculating messages...')
 
-        response = get_response(message)
+        response = send_heard_message(
+            client.user.id,
+            message.channel.name,
+            message.content)
 
         await client.edit_message(tmp, response)
 
         # Sleep for a random amount of time, then send the message
-        timeout = random.randrange(1, 10)
+        # timeout = random.randrange(1, 10)
+        timeout = 60
         await asyncio.sleep(timeout)
-        print('here')
         await client.send_message(message.channel, response)
 
     client.run(discord_key)

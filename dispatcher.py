@@ -57,7 +57,7 @@ class Bot():
         #  if log.author == message.author:
         #  counter += 1
         # Maybe look at all the previous messsages?
-        self.all_messages.extend(message.content)
+        self.all_messages.extend(message)
         return 'test hi'
 
 
