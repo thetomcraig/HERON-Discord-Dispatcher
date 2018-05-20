@@ -1,5 +1,6 @@
 import asyncio
 import random
+from time import sleep
 import sys
 
 import discord
@@ -27,20 +28,26 @@ def run_bot(discord_key):
         This function will loop, it sends a message,
         then gets called again when that message gets sent
         """
-        tmp = await client.send_message(message.channel, 'Calculating messages...')
-
-        response = send_heard_message(
+        print('client, got message')
+        print(client.user.name)
+        print(message.content)
+        should_send_reply, reply = send_heard_message(
             client.user.id,
+            message.author.name,
             message.channel.name,
             message.content)
+        print('client, got response after sending heard')
+        print(client.user.name)
+        print(should_send_reply)
+        print(reply)
 
-        await client.edit_message(tmp, response)
-
-        # Sleep for a random amount of time, then send the message
-        # timeout = random.randrange(1, 10)
-        timeout = 60
-        await asyncio.sleep(timeout)
-        await client.send_message(message.channel, response)
+        if should_send_reply:
+            # Sleep for a random amount of time, then send the message
+            # timeout = random.randrange(1, 10)
+            print('Sleeping for 60')
+            timeout = 6 + len(client.user.name)
+            sleep(timeout)
+            await client.send_message(message.channel, reply)
 
     client.run(discord_key)
 
