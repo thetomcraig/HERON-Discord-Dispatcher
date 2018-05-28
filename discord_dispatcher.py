@@ -2,21 +2,18 @@ import asyncio
 import sys
 import os
 import time
-from datetime import datetime
-from threading import Thread
 
 import discord
 
 from api_helpers import send_logged_in_message
-from local_settings import conversation_name
+from local_settings import conversation_name, sleep_time
 
 
 def run_bot(discord_key):
 
     key = discord_key
     client = discord.Client()
-    loop = asyncio.get_event_loop()
-    client.started = False
+    client.generator_started = False
 
     @client.event
     async def on_ready():
@@ -26,26 +23,21 @@ def run_bot(discord_key):
 
     @client.event
     async def on_message(message):
-        if not client.started:
-            client.started = True
+        if not client.generator_started:
+            client.generator_started = True
             asyncio.ensure_future(loop_and_send(client, message.channel))
-            loop.run_forever()
-        print('ON MESSAGE DONE')
 
     @asyncio.coroutine
     def loop_and_send(the_client, the_channel):
         """
         Generator continually checks if there is a new message to send
         """
-
-        while(True):
-            print('looping')
+        generator_on = True
+        while(generator_on):
             reply = check_file_system_for_reply(the_client.user.name)
             if reply:
-                success = yield from the_client.send_message(the_channel, reply)
-                print('success')
-                print(success)
-            time.sleep(5)
+                yield from the_client.send_message(the_channel, reply)
+            time.sleep(sleep_time)
 
     def check_file_system_for_reply(username):
         reply = None
@@ -57,13 +49,10 @@ def run_bot(discord_key):
                 if len(lines):
                     reply = lines[0]
                     os.remove(file_name)
-            print('got reply:')
 
         except Exception as e:
             print('No file found')
 
-        print('got reply:')
-        print(reply)
         return reply
 
     # Run the whole ding dang thing
