@@ -3,6 +3,7 @@ import sys
 import os
 import time
 from datetime import datetime
+from threading import Thread
 
 import discord
 
@@ -14,6 +15,8 @@ def run_bot(discord_key):
 
     key = discord_key
     client = discord.Client()
+    loop = asyncio.get_event_loop()
+    client.started = False
 
     @client.event
     async def on_ready():
@@ -21,51 +24,35 @@ def run_bot(discord_key):
         print('Logged in')
         send_logged_in_message(key, client.user.name, conversation_name)
 
-    #  @client.event
-    #  async def on_message(message):
-        #  if (message.author.name == client.user.name):
-            #  print('Will not respond to my own message')
-            #  # Ignore your own messages
-            #  return
-
-        #  # Check the fs to see if message exists
-        #  reply = check_file_system_for_reply(client.user.name)
-        #  # DEBUG
-        #  if reply:
-            #  await client.send_message(message.channel, reply)
-            #  print('will sleep 20')
-            #  await asyncio.sleep(20)
-        #  else:
-            #  print('will sleep 2')
-            #  await asyncio.sleep(2)
-
-        #  print('done sleeping')
-        #  print(datetime.now())
     @client.event
     async def on_message(message):
-        print('setting channel')
-        await run_generator(client, message.channel)
+        if not client.started:
+            client.started = True
+            asyncio.ensure_future(loop_and_send(client, message.channel))
+            loop.run_forever()
+        print('ON MESSAGE DONE')
 
-    async def run_generator(the_client, the_channel):
-        check_forever = True
+    @asyncio.coroutine
+    def loop_and_send(the_client, the_channel):
+        """
+        Generator continually checks if there is a new message to send
+        """
 
-        while(check_forever):
-            print('will sleep 20')
-            time.sleep(20)
-
-            print('done sleeping')
-            print(datetime.now())
-            reply = str(datetime.now())
-            await the_client.send_message(the_channel, reply)
+        while(True):
+            print('looping')
+            reply = check_file_system_for_reply(the_client.user.name)
+            if reply:
+                success = yield from the_client.send_message(the_channel, reply)
+                print('success')
+                print(success)
+            time.sleep(5)
 
     def check_file_system_for_reply(username):
         reply = None
         safe_username = username.replace(' ', '_')
-        print('/tmp/discord/{}.txt'.format(safe_username))
         file_name = '/tmp/discord/{}.txt'.format(safe_username)
         try:
             with open(file_name, 'r') as f:
-                print('File found')
                 lines = f.readlines()
                 if len(lines):
                     reply = lines[0]
@@ -79,6 +66,7 @@ def run_bot(discord_key):
         print(reply)
         return reply
 
+    # Run the whole ding dang thing
     client.run(key)
 
 
