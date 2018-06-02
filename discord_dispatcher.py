@@ -22,6 +22,10 @@ def run_bot(discord_key):
 
     @client.event
     async def on_message(message):
+        """
+        Called whenever this bot sees a new message in discord
+        It will *only once* start a generator to make/send new messages
+        """
         if not client.generator_started:
             client.generator_started = True
             asyncio.ensure_future(run_generator(client, message.channel))
@@ -29,11 +33,11 @@ def run_bot(discord_key):
     @asyncio.coroutine
     def run_generator(the_client, the_channel):
         """
-        Generator continually checks if there is a new message to send
+        Runs on a loop and checks if a new message exists to send
         """
         generator_on = True
         while(generator_on):
-            reply = get_new_message(the_client.user.name)
+            reply = get_new_message(key, the_client.user.name, conversation_name)
             if reply:
                 yield from the_client.send_message(the_channel, reply)
             time.sleep(sleep_time)

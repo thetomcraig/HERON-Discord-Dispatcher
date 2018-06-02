@@ -23,10 +23,16 @@ def send_logged_in_message(caller_key, username, conversation_name):
 
 
 def get_new_message(caller_key, username, conversation_name):
-    post_data = format_post_data(caller_key, username, conversation_name)
+    reply = None
+
     try:
+        post_data = format_post_data(caller_key, username, conversation_name)
         response = requests.post(MESSAGE_QUERY_ENDPOINT, data=post_data)
-# READ THE MESSAGE FROM THE RESPONSE OBJ HERE AND SEND BACK TO DISPATCHER
-        return response
+        response_dict = response.json()
+        should_send = response_dict.get('should_send')
+        if should_send:
+            reply = response_dict.get('message')
     except requests.exceptions.RequestException:
         print('Uable to contact HERON; exiting')
+    finally:
+        return reply
