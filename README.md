@@ -1,7 +1,4 @@
 ### Discord Dispatcher
-<p align="center">
-    <img src="https://github.com/jasonlong/vim-replacement-icon/blob/master/vim.png" width="256" align="middle">
-</p>
 
 ## What is this
 This is a library for dispatching bot messages on a discord server
